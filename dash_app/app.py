@@ -13,33 +13,10 @@ app = dash.Dash(__name__,
 server = app.server
 app.title = "Harmstatus Dashboard"
 
-def get_data():
-    try:
-        # Connect to the SQLite database (adjust the path as needed)
-        db_path = os.path.join(os.path.dirname(__file__), 'Data', 'Harm_sumstats_status.db')
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
-        
-        # Query to fetch all data from the 'studies' table
-        cursor.execute("SELECT * FROM studies")
-        rows = cursor.fetchall()
-
-        # Optionally, you can convert rows into a list of dictionaries or a suitable format
-        # Example: converting rows to a list of dictionaries with column names
-        columns = [column[0] for column in cursor.description]  # Fetch column names
-        result = [dict(zip(columns, row)) for row in rows]
-
-        # Close the connection
-        conn.close()
-
-        return result
-    except sqlite3.DatabaseError:
-        return []
-
-
 # Define the layout of the app
 app.layout = dbc.Container([
-    dcc.Store(id='shared-data', data=get_data()),
+    dcc.Store(id='shared-data'),
+    dcc.Interval(id='trigger-load', interval=500, n_intervals=0, max_intervals=1),
 
     dbc.NavbarSimple(
         brand="Harmstatus Dashboard",
@@ -53,8 +30,26 @@ app.layout = dbc.Container([
     dash.page_container  # This will display the current page content
 ], fluid=True)
 
-# Start data fetching in the background when the app runs
 # Callback to fetch the data
+@app.callback(
+    Output("shared-data", "data"),
+    Input("trigger-load", "n_intervals"),
+    prevent_initial_call="initial_duplicate"
+)
+def load_data(n):
+    db_path = os.path.join(os.path.dirname(__file__), 'Data', 'Harm_sumstats_status.db')
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM studies")
+    rows = cursor.fetchall()
+    columns = [column[0] for column in cursor.description]
+    result = [dict(zip(columns, row)) for row in rows]
+
+    conn.close()
+    return result
+
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 8050))  # Render provides PORT env
+    app.run(host="0.0.0.0", port=port)
