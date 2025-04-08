@@ -6,7 +6,7 @@ authors = ["jiyue1214 <jiyue1214@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.11,<3.13"
 dash = "^3.0.2"
 dash-bootstrap-components = "^2.0.0"
 requests = "^2.32.3"
