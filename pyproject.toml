@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "harm-status-plotly"
+version = "0.1.0"
+description = ""
+authors = ["jiyue1214 <jiyue1214@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+dash = "^3.0.2"
+dash-bootstrap-components = "^2.0.0"
+requests = "^2.32.3"
+pandas = "^2.2.3"
+plotly = "^6.0.1"
+dash-mantine-components = "^1.1.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
