@@ -1,9 +1,9 @@
 # app.py
 import dash
-from dash import html, dcc
+from dash import dcc
 import dash_bootstrap_components as dbc
-import requests
-#import dash_extensions as de
+from dash.dependencies import Input, Output
+import sqlite3
 
 # Initialize the Dash app with Bootstrap
 app = dash.Dash(__name__, 
@@ -13,26 +13,28 @@ app.title = "Harmstatus Dashboard"
 
 # Fetch the data from the FastAPI endpoint
 
+# Asynchronous function to get data for each page
 def get_data():
-    all_data = []
-    page = 1  # Initial page number (adjust if necessary based on the API's pagination)
-    
-    while True:
-        try:
-            response = requests.get(f"https://harm-status-api.onrender.com/?page={page}")  # Include pagination in the URL if needed
-            data = response.json()
-            
-            if not data:  # No more data, break the loop
-                break
-            
-            all_data.extend(data)  # Accumulate the data from this page
-            
-            page += 1  # Move to the next page
-            
-        except requests.exceptions.RequestException:
-            break  # Exit the loop if there's a request error
+    try:
+        # Connect to the SQLite database (adjust the path as needed)
+        conn = sqlite3.connect('./Data/Harm_sumstats_status.db')
+        cursor = conn.cursor()
+        
+        # Query to fetch all data from the 'studies' table
+        cursor.execute("SELECT * FROM studies")
+        rows = cursor.fetchall()
 
-    return all_data
+        # Optionally, you can convert rows into a list of dictionaries or a suitable format
+        # Example: converting rows to a list of dictionaries with column names
+        columns = [column[0] for column in cursor.description]  # Fetch column names
+        result = [dict(zip(columns, row)) for row in rows]
+
+        # Close the connection
+        conn.close()
+
+        return result
+    except sqlite3.DatabaseError:
+        return []
 
 
 # Define the layout of the app
@@ -50,6 +52,9 @@ app.layout = dbc.Container([
     ),
     dash.page_container  # This will display the current page content
 ], fluid=True)
+
+# Start data fetching in the background when the app runs
+# Callback to fetch the data
 
 if __name__ == "__main__":
     app.run(debug=True)
