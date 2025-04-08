@@ -10,6 +10,7 @@ import sqlite3
 app = dash.Dash(__name__, 
                 external_stylesheets=[dbc.themes.BOOTSTRAP],
                 use_pages=True)  # Enable pages
+server = app.server
 app.title = "Harmstatus Dashboard"
 
 def get_data():

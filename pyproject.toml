@@ -13,6 +13,7 @@ requests = "^2.32.3"
 pandas = "^2.2.3"
 plotly = "^6.0.1"
 dash-mantine-components = "^1.1.1"
+gunicorn = "^23.0.0"
 
 
 [build-system]
