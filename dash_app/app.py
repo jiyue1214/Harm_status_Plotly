@@ -37,20 +37,25 @@ app.layout = dbc.Container([
     prevent_initial_call="initial_duplicate"
 )
 def load_data(n):
-    db_path = os.path.join(os.path.dirname(__file__), 'Data', 'Harm_sumstats_status.db')
-    print("Looking for DB at:", db_path)
-    print("Exists?", os.path.exists(db_path))
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+    print("⚡ Callback triggered...")
+    try:
+        db_path = os.path.join(os.path.dirname(__file__), 'Data', 'Harm_sumstats_status.db')
+        print("Looking for DB at:", db_path)
+        print("Exists?", os.path.exists(db_path))
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM studies")
-    rows = cursor.fetchall()
-    columns = [column[0] for column in cursor.description]
-    result = [dict(zip(columns, row)) for row in rows]
-    print("Fetched rows:", len(result))
+        cursor.execute("SELECT * FROM studies")
+        rows = cursor.fetchall()
+        columns = [column[0] for column in cursor.description]
+        result = [dict(zip(columns, row)) for row in rows]
+        print("Fetched rows:", len(result))
 
-    conn.close()
-    return result
+        conn.close()
+        return result
+    except sqlite3.DatabaseError as e:
+        print(f"Error loading data: {e}")
+        return []
 
 
 if __name__ == "__main__":
