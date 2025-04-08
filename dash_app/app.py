@@ -1,4 +1,5 @@
 # app.py
+import os,sys
 import dash
 from dash import dcc
 import dash_bootstrap_components as dbc
@@ -11,13 +12,11 @@ app = dash.Dash(__name__,
                 use_pages=True)  # Enable pages
 app.title = "Harmstatus Dashboard"
 
-# Fetch the data from the FastAPI endpoint
-
-# Asynchronous function to get data for each page
 def get_data():
     try:
         # Connect to the SQLite database (adjust the path as needed)
-        conn = sqlite3.connect('./Data/Harm_sumstats_status.db')
+        db_path = os.path.join(os.path.dirname(__file__), 'Data', 'Harm_sumstats_status.db')
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
         # Query to fetch all data from the 'studies' table
