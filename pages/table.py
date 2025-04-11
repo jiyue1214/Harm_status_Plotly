@@ -5,9 +5,17 @@ import pandas as pd
 from dash.exceptions import PreventUpdate
 import dash_mantine_components as dmc
 import re
+import requests
 
 # Register this file as a page
 dash.register_page(__name__, path="/", title="Table View")
+
+def get_data(): 
+    try:
+        response = requests.get("http://127.0.0.1:8000/")
+        return response.json()
+    except requests.exceptions.RequestException:
+        return []
 
 # Define the layout of the table page
 layout = dmc.MantineProvider([
@@ -170,13 +178,15 @@ layout = dmc.MantineProvider([
 ])
 
 # Load data and update stores
+
 @callback(
-    Output('table-data-store', 'data'),
-    Output('column-selector', 'data'),
-    Output('column-selector', 'value'),  # Default: Select all columns
-    Input('shared-data', 'data')
-)
+     Output('table-data-store', 'data'),
+     Output('column-selector', 'data'),
+     Output('column-selector', 'value'),  # Default: Select all columns
+     Input('harmonised-studies', 'id')
+ )
 def load_data(data):
+    data = get_data()
     if not data:
         return [], [], []
 
